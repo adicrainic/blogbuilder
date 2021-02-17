@@ -3,10 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Full stack blog</title>
         <link rel="stylesheet" href="/css/all.css">
 
+        <script>
+            (function () {
+                window.Laravel = {
+                    csrfToken: '{{csrf_token()}}'
+                };
+            })();
+        </script>
     </head>
     <body class="">
             <div id="app">

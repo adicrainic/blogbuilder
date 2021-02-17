@@ -6,10 +6,11 @@ import newRoutePage from './components/pages/newRoutePage'
 import hooks from './components/pages/basic/hooks'
 
 import home from './components/pages/home'
-import tags from './components/pages/tags'
+import tags from './admin/pages/tags'
+import category from './admin/pages/category'
 
 const routes = [
-    //project routes
+    //admin project routes
     {
         path: '/',
         component: home,
@@ -18,7 +19,10 @@ const routes = [
         path: '/tags',
         component: tags
     },
-
+    {
+        path: '/category',
+        component: category
+    },
     //test routes
     {
         path: '/my-new-vue-route',

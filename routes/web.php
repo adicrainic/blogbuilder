@@ -15,6 +15,10 @@ use App\Http\Controllers\AdminController;
 */
 
 Route::post('app/create_tag', [AdminController::class, 'addTag']);
+Route::post('app/edit_tag', [AdminController::class, 'editTag']);
+Route::post('app/delete_tag', [AdminController::class, 'deleteTag']);
+Route::post('app/upload', [AdminController::class, 'upload']);
+
 Route::get('app/get_tags', [AdminController::class, 'get_tags']);
 
 Route::get('/', function () {
