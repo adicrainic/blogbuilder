@@ -1962,6 +1962,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -1994,30 +2002,51 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return _this.callApi('post', 'app/create_category', _this.data);
+                if (!(_this.data.categoryName.trim() == '')) {
+                  _context.next = 2;
+                  break;
+                }
+
+                return _context.abrupt("return", _this.errorMessage('Category Name is required!'));
 
               case 2:
+                if (!(_this.data.iconImage.trim() == '')) {
+                  _context.next = 4;
+                  break;
+                }
+
+                return _context.abrupt("return", _this.errorMessage('Icon Image is required!'));
+
+              case 4:
+                _context.next = 6;
+                return _this.callApi('post', 'app/create_category', _this.data);
+
+              case 6:
                 res = _context.sent;
 
                 if (res.status === 201) {
-                  _this.ca.unshift(res.data);
+                  _this.categories.unshift(res.data);
 
                   _this.successMessage('Category added successfully !');
 
                   _this.addModal = false;
                   _this.data.categoryName = '';
+                  _this.data.iconImage = '';
                 } else {
                   if (res.status === 422) {
                     if (res.data.errors.categoryName) {
                       _this.errorMessage(res.data.errors.categoryName[0]);
+                    }
+
+                    if (res.data.errors.iconImage) {
+                      _this.errorMessage(res.data.errors.iconImage[0]);
                     }
                   } else {
                     _this.genericMessage('An error occurred');
                   }
                 }
 
-              case 4:
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -2041,15 +2070,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 res = _context2.sent;
 
                 if (res.status === 200) {
-                  _this2.tags[_this2.index].tagName = _this2.editData.tagName;
+                  _this2.categories[_this2.index].categoryName = _this2.editData.categoryName;
+                  _this2.categories[_this2.index].iconImage = _this2.editData.iconImage;
 
-                  _this2.successMessage('Tag edited successfully !');
+                  _this2.successMessage('Category edited successfully !');
 
                   _this2.editModal = false;
                 } else {
                   if (res.status === 422) {
-                    if (res.data.errors.tagName) {
-                      _this2.errorMessage(res.data.errors.tagName[0]);
+                    if (res.data.errors.categoryName) {
+                      _this2.errorMessage(res.data.errors.categoryName[0]);
+                    }
+
+                    if (res.data.errors.iconImage) {
+                      _this2.errorMessage(res.data.errors.iconImage[0]);
                     }
                   } else {
                     _this2.genericMessage('An error occurred !');
@@ -2064,16 +2098,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2);
       }))();
     },
-    showEditModal: function showEditModal(tag, index) {
+    showEditModal: function showEditModal(category, index) {
       var obj = {
-        id: tag.id,
-        tagName: tag.tagName
+        id: category.id,
+        categoryName: category.tagName
       };
       this.editData = obj;
       this.editModal = true;
       this.index = index;
     },
-    deleteTag: function deleteTag() {
+    deleteCategory: function deleteCategory() {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
@@ -2084,16 +2118,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 _this3.isDeleting = true;
                 _context3.next = 3;
-                return _this3.callApi('post', 'app/delete_tag', _this3.deleteItem);
+                return _this3.callApi('post', 'app/delete_category', _this3.deleteItem);
 
               case 3:
                 res = _context3.sent;
 
                 if (res.status === 200) {
                   //remove from array one element starting from index
-                  _this3.tags.splice(_this3.i, 1);
+                  _this3.categories.splice(_this3.i, 1);
 
-                  _this3.successMessage('Tag has been deleted !');
+                  _this3.successMessage('Category has been deleted !');
                 } else {
                   _this3.errorMessage('An error occurred !');
                 }
@@ -2117,10 +2151,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     handleSuccess: function handleSuccess(res, file) {
       this.data.iconImage = res;
     },
-    handleFormatError: function handleFormatError(file) {
+    handleError: function handleError(res, file) {
+      console.log('res', res);
+      console.log('file', file);
       this.$Notice.warning({
-        title: 'The file format is incorrect',
-        desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
+        title: 'File format is wrong',
+        desc: "".concat(file.errors.file.length ? file.errors.file[0] : 'Something went wrong !')
       });
     },
     handleMaxSize: function handleMaxSize(file) {
@@ -2128,36 +2164,72 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         title: 'Exceeding file size limit',
         desc: 'File  ' + file.name + ' is too large, no more than 2M.'
       });
+    },
+    deleteImage: function deleteImage() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+        var image, res;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                image = _this4.data.iconImage;
+                _this4.data.iconImage = '';
+
+                _this4.$refs.uploads.clearFiles();
+
+                _context4.next = 5;
+                return _this4.callApi('post', 'app/delete_image', {
+                  imageName: image
+                });
+
+              case 5:
+                res = _context4.sent;
+
+                if (res.status != 200) {
+                  _this4.data.iconImage = image;
+                } else {
+                  _this4.successMessage('Image deleted successfully!');
+                }
+
+              case 7:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
     }
   },
   created: function created() {
-    var _this4 = this;
+    var _this5 = this;
 
-    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
       var res;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              _this4.token = window.Laravel.csrfToken;
-              _context4.next = 3;
-              return _this4.callApi('get', 'app/get_tags');
+              _this5.token = window.Laravel.csrfToken;
+              _context5.next = 3;
+              return _this5.callApi('get', 'app/get_category');
 
             case 3:
-              res = _context4.sent;
+              res = _context5.sent;
 
               if (res.status === 200) {
-                _this4.tags = res.data;
+                _this5.tags = res.data;
               } else {
-                _this4.errorMessage('An error ocurred !');
+                _this5.errorMessage('An error ocurred !');
               }
 
             case 5:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
-      }, _callee4);
+      }, _callee5);
     }))();
   }
 });
@@ -68118,15 +68190,19 @@ var render = function() {
               _c(
                 "Upload",
                 {
+                  ref: "uploads",
                   attrs: {
                     type: "drag",
                     action: "app/upload",
-                    headers: { "x-csrf-token": _vm.token },
+                    headers: {
+                      "x-csrf-token": _vm.token,
+                      "X-Requested-With": "XMLHttpRequest"
+                    },
                     "on-success": _vm.handleSuccess,
-                    format: ["jpg", "jpeg", "png"],
+                    "on-error": _vm.handleError,
                     "max-size": 2048,
-                    "on-format-error": _vm.handleFormatError,
-                    "on-exceeded-size": _vm.handleMaxSize
+                    "on-exceeded-size": _vm.handleMaxSize,
+                    "on-format-error": _vm.handleError
                   }
                 },
                 [
@@ -68177,7 +68253,27 @@ var render = function() {
                   )
                 ],
                 1
-              )
+              ),
+              _vm._v(" "),
+              _vm.data.iconImage
+                ? _c("div", { staticClass: "demo-upload-list" }, [
+                    _c("img", {
+                      attrs: { src: "/uploads/" + _vm.data.iconImage }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "demo-upload-list-cover" },
+                      [
+                        _c("Icon", {
+                          attrs: { type: "ios-trash-outline" },
+                          on: { click: _vm.deleteImage }
+                        })
+                      ],
+                      1
+                    )
+                  ])
+                : _vm._e()
             ],
             1
           ),

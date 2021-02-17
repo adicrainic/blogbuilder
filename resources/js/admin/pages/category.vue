@@ -39,27 +39,35 @@
                     <Input v-model="data.categoryName" placeholder="Add Category Name" />
                     <div class="space"></div>
                     <Upload
+                        ref="uploads"
                         type="drag"
                         action="app/upload"
-                        :headers ="{'x-csrf-token' : token}"
+                        :headers ="{'x-csrf-token' : token, 'X-Requested-With' : 'XMLHttpRequest'}"
                         :on-success="handleSuccess"
-<!--                        :format="['jpg','jpeg','png']"-->
+                        :on-error="handleError"
                         :max-size="2048"
-<!--                        :on-format-error="handleFormatError"-->
                         :on-exceeded-size="handleMaxSize"
+                        :on-format-error="handleError"
                     >
-
-
                         <div style="padding: 20px 0">
                             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                             <p>Click or drag files here to upload</p>
                         </div>
+
                     </Upload>
 
                     <div slot="footer">
                         <Button type="default" @click="addModal=false">Close</Button>
                         <Button type="primary" @click="addCategory" :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Adding' : 'Add Category'}}</Button>
                     </div>
+
+                    <div class="demo-upload-list" v-if="data.iconImage">
+                        <img :src="`/uploads/${data.iconImage}`">
+                        <div class="demo-upload-list-cover">
+                            <Icon type="ios-trash-outline" @click="deleteImage"></Icon>
+                        </div>
+                    </div>
+
                 </Modal>
                 <!-- category editing modal-->
                 <Modal
@@ -122,18 +130,25 @@ export default {
     },
     methods: {
         async addCategory() {
+            if(this.data.categoryName.trim() == '')
+                return this.errorMessage('Category Name is required!')
+            if(this.data.iconImage.trim() == '')
+                return this.errorMessage('Icon Image is required!')
 
             const res = await this.callApi('post', 'app/create_category', this.data)
             if (res.status === 201) {
-                this.ca.unshift(res.data);
+                this.categories.unshift(res.data);
                 this.successMessage('Category added successfully !');
                 this.addModal = false;
                 this.data.categoryName = '';
+                this.data.iconImage = '';
             } else {
                 if(res.status === 422) {
                     if(res.data.errors.categoryName){
                         this.errorMessage(res.data.errors.categoryName[0])
-
+                    }
+                    if(res.data.errors.iconImage){
+                        this.errorMessage(res.data.errors.iconImage[0])
                     }
                 }else {
                     this.genericMessage('An error occurred');
@@ -147,14 +162,17 @@ export default {
 
             const res = await this.callApi('post', 'app/edit_category', this.editData)
             if (res.status === 200) {
-                this.tags[this.index].tagName = this.editData.tagName;
-                this.successMessage('Tag edited successfully !');
+                this.categories[this.index].categoryName = this.editData.categoryName;
+                this.categories[this.index].iconImage = this.editData.iconImage;
+                this.successMessage('Category edited successfully !');
                 this.editModal = false;
             } else {
                 if(res.status === 422) {
-                    if(res.data.errors.tagName){
-                        this.errorMessage(res.data.errors.tagName[0])
-
+                    if(res.data.errors.categoryName){
+                        this.errorMessage(res.data.errors.categoryName[0])
+                    }
+                    if(res.data.errors.iconImage){
+                        this.errorMessage(res.data.errors.iconImage[0])
                     }
                 }else {
                     this.genericMessage('An error occurred !');
@@ -163,10 +181,10 @@ export default {
 
 
         },
-        showEditModal(tag, index) {
+        showEditModal(category, index) {
             let obj = {
-                id: tag.id,
-                tagName : tag.tagName
+                id: category.id,
+                categoryName : category.tagName
 
             }
             this.editData = obj;
@@ -174,13 +192,13 @@ export default {
             this.index = index;
         },
 
-        async deleteTag() {
+        async deleteCategory() {
             this.isDeleting = true;
-            const res = await this.callApi('post', 'app/delete_tag', this.deleteItem)
+            const res = await this.callApi('post', 'app/delete_category', this.deleteItem)
             if (res.status === 200) {
                 //remove from array one element starting from index
-                this.tags.splice(this.i,1);
-                this.successMessage('Tag has been deleted !');
+                this.categories.splice(this.i,1);
+                this.successMessage('Category has been deleted !');
             }else{
                 this.errorMessage('An error occurred !')
             }
@@ -197,10 +215,12 @@ export default {
         handleSuccess (res, file) {
            this.data.iconImage = res
         },
-        handleFormatError (file) {
+        handleError (res, file) {
+            console.log('res', res);
+            console.log('file',file);
             this.$Notice.warning({
-                title: 'The file format is incorrect',
-                desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
+                title: 'File format is wrong',
+                desc: `${file.errors.file.length ? file.errors.file[0] : 'Something went wrong !'}`
             });
         },
         handleMaxSize (file) {
@@ -209,6 +229,17 @@ export default {
                 desc: 'File  ' + file.name + ' is too large, no more than 2M.'
             });
         },
+        async deleteImage() {
+            let image = this.data.iconImage
+            this.data.iconImage = ''
+            this.$refs.uploads.clearFiles()
+            const res = await this.callApi('post','app/delete_image', {imageName: image})
+            if(res.status != 200){
+                this.data.iconImage = image;
+            }else{
+                this.successMessage('Image deleted successfully!');
+            }
+        }
 
 
 
@@ -216,7 +247,7 @@ export default {
 
     async created() {
         this.token = window.Laravel.csrfToken
-        const  res =  await this.callApi('get', 'app/get_tags')
+        const  res =  await this.callApi('get', 'app/get_category')
         if(res.status === 200) {
             this.tags = res.data;
         }else{
