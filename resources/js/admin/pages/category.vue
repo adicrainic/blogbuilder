@@ -11,6 +11,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Category Name</th>
+                            <th>Icon Image</th>
                             <th>Created At</th>
                             <th>Action</th>
                         </tr>
@@ -18,9 +19,11 @@
 
 
                         <!-- ITEMS -->
-                        <tr v-for="(category, i) in categories" :key="i" v-if="categorys.length">
+                        <tr v-for="(category, i) in categories" :key="i" v-if="categories.length">
                             <td>{{category.id}}</td>
                             <td class="_table_name">{{category.categoryName}}</td>
+                            <td class="table_image"><img :src="category.iconImage">
+                            </td>
                             <td>{{category.created_at}}</td>
                             <td>
                                 <Button type="info" size="small" @click="showEditModal(category, i)">Edit</Button>
@@ -62,7 +65,7 @@
                     </div>
 
                     <div class="demo-upload-list" v-if="data.iconImage">
-                        <img :src="`/uploads/${data.iconImage}`">
+                        <img :src="`${data.iconImage}`">
                         <div class="demo-upload-list-cover">
                             <Icon type="ios-trash-outline" @click="deleteImage"></Icon>
                         </div>
@@ -72,18 +75,44 @@
                 <!-- category editing modal-->
                 <Modal
                     v-model="editModal"
-                    title="Edit category"
+                    title="Edit Category"
                     :mask-closable="false"
                     :closable="false"
                 >
-                    <Input v-model="editData.categoryName" placeholder="Edit category Name" />
+                    <Input v-model="editData.categoryName" placeholder="Edit Category Name" />
+                    <div class="space"></div>
+                    <Upload v-show="isIconImageNew"
+                        ref="editDataUploads"
+                        type="drag"
+                        action="app/upload"
+                        :headers ="{'x-csrf-token' : token, 'X-Requested-With' : 'XMLHttpRequest'}"
+                        :on-success="handleSuccess"
+                        :on-error="handleError"
+                        :max-size="2048"
+                        :on-exceeded-size="handleMaxSize"
+                        :on-format-error="handleError"
+                    >
+                        <div style="padding: 20px 0">
+                            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                            <p>Click or drag files here to upload</p>
+                        </div>
 
+                    </Upload>
 
                     <div slot="footer">
-                        <Button type="default" @click="editModal=false">Close</Button>
-                        <Button type="primary" @click="editCategory" :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Editing' : 'Edit category'}}</Button>
+                        <Button type="default" @click="closeEditModal">Close</Button>
+                        <Button type="primary" @click="editCategory" :disabled="isEditing" :loading="isEditing">{{isEditing ? 'Editing' : 'Edit Category'}}</Button>
                     </div>
+
+                    <div class="demo-upload-list" v-if="editData.iconImage">
+                        <img :src="`${editData.iconImage}`">
+                        <div class="demo-upload-list-cover">
+                            <Icon type="ios-trash-outline" @click="deleteImage(false)"></Icon>
+                        </div>
+                    </div>
+
                 </Modal>
+
                 <!--delete modal confirmation-->
                 <Modal v-model="showDeleteModal" width="360">
                     <p slot="header" style="color:#f60;text-align:center">
@@ -116,16 +145,21 @@ export default {
             addModal: false,
             editModal: false,
             isAdding: false,
+            isEditing: false,
             categories: [],
             editData: {
-                categoryName: ''
+                categoryName: '',
+                iconImage: ''
             },
             index: -1,
             showDeleteModal: false,
             isDeleting: false,
             deleteItem: {},
             deletingIndex: -1,
-            token: ''
+            token: '' ,
+            isIconImageNew : false,
+            isEditingItem: false
+
         }
     },
     methods: {
@@ -134,6 +168,8 @@ export default {
                 return this.errorMessage('Category Name is required!')
             if(this.data.iconImage.trim() == '')
                 return this.errorMessage('Icon Image is required!')
+
+            this.data.iconImage = `/uploads/${this.data.iconImage}`;
 
             const res = await this.callApi('post', 'app/create_category', this.data)
             if (res.status === 201) {
@@ -151,7 +187,7 @@ export default {
                         this.errorMessage(res.data.errors.iconImage[0])
                     }
                 }else {
-                    this.genericMessage('An error occurred');
+                    this.errorMessage('An error occurred');
                 }
             }
 
@@ -159,6 +195,11 @@ export default {
         },
 
         async editCategory() {
+            if(this.editData.categoryName.trim() == '')
+                return this.errorMessage('Category Name is required!')
+            if(this.editData.iconImage.trim() == '')
+                return this.errorMessage('Icon Image is required!')
+
 
             const res = await this.callApi('post', 'app/edit_category', this.editData)
             if (res.status === 200) {
@@ -182,14 +223,16 @@ export default {
 
         },
         showEditModal(category, index) {
-            let obj = {
-                id: category.id,
-                categoryName : category.tagName
-
-            }
-            this.editData = obj;
+            // let obj = {
+            //     id: category.id,
+            //     categoryName : category.categoryName,
+            //     iconImage: category.iconImage
+            //
+            // }
+            this.editData = category;
             this.editModal =true;
             this.index = index;
+            this.isEditingItem = true;
         },
 
         async deleteCategory() {
@@ -206,14 +249,18 @@ export default {
             this.showDeleteModal = false;
         },
 
-        showDeletingModal(tag, i) {
-            this.deleteItem = tag;
+        showDeletingModal(category, i) {
+            this.deleteItem = category;
             this.deletingIndex = i;
             this.showDeleteModal = true;
         },
 
         handleSuccess (res, file) {
-           this.data.iconImage = res
+            res = `/uploads/${res}`
+            if(this.isEditingItem){
+               return this.editData.iconImage = res
+            }
+            this.data.iconImage = res
         },
         handleError (res, file) {
             console.log('res', res);
@@ -229,16 +276,33 @@ export default {
                 desc: 'File  ' + file.name + ' is too large, no more than 2M.'
             });
         },
-        async deleteImage() {
-            let image = this.data.iconImage
-            this.data.iconImage = ''
-            this.$refs.uploads.clearFiles()
+        async deleteImage(isAdd=true) {
+            let image
+            if(!isAdd){
+                this.isIconImageNew = true
+                image = this.editData.iconImage
+                this.editData.iconImage = ''
+                this.$refs.editDataUploads.clearFiles()
+
+
+            }else {
+                image = this.data.iconImage
+                this.data.iconImage = ''
+                this.$refs.uploads.clearFiles()
+
+
+            }
             const res = await this.callApi('post','app/delete_image', {imageName: image})
             if(res.status != 200){
                 this.data.iconImage = image;
+                this.editData.iconImage = image;
             }else{
                 this.successMessage('Image deleted successfully!');
             }
+        },
+
+        closeEditModal(){
+            this.editModal = false;
         }
 
 
@@ -249,7 +313,7 @@ export default {
         this.token = window.Laravel.csrfToken
         const  res =  await this.callApi('get', 'app/get_category')
         if(res.status === 200) {
-            this.tags = res.data;
+            this.categories = res.data;
         }else{
             this.errorMessage('An error ocurred !');
         }
@@ -261,6 +325,3 @@ export default {
 <style scoped>
 
 </style>
-
-
-<!--https://www.youtube.com/watch?v=KfjEZzisQTo-->

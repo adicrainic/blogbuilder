@@ -75,6 +75,32 @@ class AdminController extends Controller
         );
     }
 
+    public function get_category(Request $request) {
+        return Category::orderBy('id','desc')->get();
+
+    }
+
+    public function deleteCategory(Request $request){
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+        return Category::where('id' ,$request->id)->delete();
+    }
+
+    public function editCategory(Request $request){
+        $this->validate($request, [
+            'categoryName' => 'required',
+            'iconImage' => 'required',
+            'id' => 'required',
+        ]);
+        return Category::where('id' ,$request->id)->update([
+                'categoryName' => $request->categoryName,
+                'iconImage' => $request->iconImage
+            ]
+        );
+    }
+
+
+
 }
 
-//https://youtu.be/rZ0gLHPmBFw?t=535
