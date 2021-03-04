@@ -60,18 +60,7 @@
                     </div>
                 </Modal>
                 <!--delete modal confirmation-->
-                <Modal v-model="showDeleteModal" width="360">
-                    <p slot="header" style="color:#f60;text-align:center">
-                        <Icon type="ios-information-circle"></Icon>
-                        <span>Delete confirmation</span>
-                    </p>
-                    <div style="text-align:center">
-                        <p>Are you sure you want to delete this tag ?</p>
-                    </div>
-                    <div slot="footer">
-                        <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteTag">Delete</Button>
-                    </div>
-                </Modal>
+                <deleteModal></deleteModal>
 
             </div>
 
@@ -80,7 +69,8 @@
 </template>
 
 <script>
-
+import deleteModal from "../components/deleteModal";
+import {mapGetters} from "vuex"
 export default {
     data(){
         return {
@@ -160,7 +150,7 @@ export default {
             const res = await this.callApi('post', 'app/delete_tag', this.deleteItem)
             if (res.status === 200) {
                 //remove from array one element starting from index
-                this.tags.splice(this.i,1);
+                this.tags.splice(this.deletingIndex,1);
                 this.successMessage('Tag has been deleted !');
             }else{
                 this.errorMessage('An error occurred !')
@@ -170,13 +160,15 @@ export default {
         },
 
         showDeletingModal(tag, i) {
-            this.deleteItem = tag
-            this.deletingIndex = i
-            this.showDeleteModal = true;
+            const deleteModalObj = {
+                    showDeleteModal: true,
+                    deleteUrl : 'app/delete_tag',
+                    data: tag,
+                    deleteIndex: i,
+                    isDeleted: false,
+            }
+            this.$store.commit('setDeletingModalObj', deleteModalObj)
         }
-
-
-
     },
 
     async created() {
@@ -186,7 +178,22 @@ export default {
         }else{
             this.errorMessage('An error ocurred !');
         }
+    },
+    components: {
+        deleteModal
+    },
+    computed: {
+      ...mapGetters(["getDeleteModalObj"])
+    },
+    watch: {
+        getDeleteModalObj(obj) {
+            if(obj.isDeleted){
+                this.tags.splice(obj.deletingIndex,1)
+            }
+        }
+
     }
+
 
 }
 </script>

@@ -110,23 +110,9 @@
                             <Icon type="ios-trash-outline" @click="deleteImage(false)"></Icon>
                         </div>
                     </div>
-
                 </Modal>
 
-                <!--delete modal confirmation-->
-                <Modal v-model="showDeleteModal" width="360">
-                    <p slot="header" style="color:#f60;text-align:center">
-                        <Icon type="ios-information-circle"></Icon>
-                        <span>Delete confirmation</span>
-                    </p>
-                    <div style="text-align:center">
-                        <p>Are you sure you want to delete this category ?</p>
-                    </div>
-                    <div slot="footer">
-                        <Button type="error" size="large" long :loading="isDeleting" :disabled="isDeleting" @click="deleteCategory">Delete</Button>
-                    </div>
-                </Modal>
-
+                <deleteModal></deleteModal>
             </div>
 
         </div>
@@ -134,6 +120,8 @@
 </template>
 
 <script>
+import deleteModal from "../components/deleteModal";
+import {mapGetters} from "vuex"
 
 export default {
     data(){
@@ -235,24 +223,15 @@ export default {
             this.isEditingItem = true;
         },
 
-        async deleteCategory() {
-            this.isDeleting = true;
-            const res = await this.callApi('post', 'app/delete_category', this.deleteItem)
-            if (res.status === 200) {
-                //remove from array one element starting from index
-                this.categories.splice(this.i,1);
-                this.successMessage('Category has been deleted !');
-            }else{
-                this.errorMessage('An error occurred !')
-            }
-            this.isDeleting = false;
-            this.showDeleteModal = false;
-        },
-
         showDeletingModal(category, i) {
-            this.deleteItem = category;
-            this.deletingIndex = i;
-            this.showDeleteModal = true;
+            const deleteModalObj = {
+                showDeleteModal: true,
+                deleteUrl : 'app/delete_category',
+                data: category,
+                deleteIndex: i,
+                isDeleted: false,
+            }
+            this.$store.commit('setDeletingModalObj', deleteModalObj)
         },
 
         handleSuccess (res, file) {
@@ -317,6 +296,20 @@ export default {
         }else{
             this.errorMessage('An error ocurred !');
         }
+    },
+    components: {
+        deleteModal
+    },
+    computed: {
+        ...mapGetters(["getDeleteModalObj"])
+    },
+    watch: {
+        getDeleteModalObj(obj) {
+            if(obj.isDeleted){
+                this.categories.splice(obj.deletingIndex,1)
+            }
+        }
+
     }
 
 }

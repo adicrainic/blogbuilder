@@ -343,7 +343,7 @@ textarea {
     box-shadow: inset 0 0 6px #e4f6ff;
 }
 ._1side_menu_content::-webkit-scrollbar-thumb {
-    background-color:  #2d8cf0;
+    background-color:  #fff;
     outline: 1px solid #fff;
 }
 ._1side_menu {
@@ -351,7 +351,7 @@ textarea {
     position: fixed;
     left: 0;
     top: 0;
-    background: #fff;
+    background: #34495E;
     height: 100vh;
     overflow: hidden;
     color: #000;
@@ -388,7 +388,7 @@ textarea {
     text-align: center;
     font-size: 19px;
     margin: 15px 0 2px;
-    color: #111113;
+    color: #fff;
 }
 ._1side_menu_list {
     margin-top: 22px;
@@ -403,7 +403,7 @@ textarea {
     color: #dcdcdc;
 }
 ._1side_menu_list_ul li a {
-    color: #000000 !important;
+    color: #fff;
     display: flex;
     font-size: 14px;
     cursor: pointer;
@@ -420,7 +420,7 @@ textarea {
 ._1side_menu_list_ul li:hover{
 }
 ._1side_menu_list_ul_active {
-    color: #2d8cf0;
+    color: #000;
     background: #ecf9ff;
 }
 ._1side_menu_list_ul_active a {
@@ -846,11 +846,10 @@ li.activeclass {
 }
 ._table tr{}
 ._table tr:first-child {
-    background: #a7ccff;
-    background: #0099ff;
+    background-color: #34495E;
 }
 ._table tr:first-child:hover{
-    background: #0099ff;
+    background: #34495E;
 }
 ._table tr:hover, ._table tr:nth-child(even):hover {
     background: #ecf9ff;
@@ -3079,7 +3078,7 @@ i.cross_icon{
 }
 
 .router-link-exact-active{
-    color: #0099ff!important;
+    color: #000 !important;
     border-right: 2px solid #0099ff !important;
     background-color: #eaeeea;
 }
