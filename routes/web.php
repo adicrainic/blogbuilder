@@ -27,6 +27,15 @@ Route::post('app/delete_category', [AdminController::class, 'deleteCategory']);
 Route::get('app/get_tags', [AdminController::class, 'get_tags']);
 Route::get('app/get_category', [AdminController::class, 'get_category']);
 
+
+Route::get('app/get_admins', [AdminController::class, 'get_admins']);
+Route::post('app/create_admin', [AdminController::class, 'addAdmin']);
+Route::post('app/edit_admin', [AdminController::class, 'editAdmin']);
+Route::post('app/delete_admin', [AdminController::class, 'deleteAdmin']);
+
+
+
+
 Route::get('/', function () {
     return view('welcome');
 });

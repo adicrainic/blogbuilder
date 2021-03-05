@@ -8,6 +8,7 @@ import hooks from './components/pages/basic/hooks'
 import home from './components/pages/home'
 import tags from './admin/pages/tags'
 import category from './admin/pages/category'
+import adminusers from "./admin/pages/adminusers";
 
 const routes = [
     //admin project routes
@@ -22,6 +23,10 @@ const routes = [
     {
         path: '/category',
         component: category
+    },
+    {
+        path: '/adminusers',
+        component: adminusers
     },
     //test routes
     {

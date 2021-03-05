@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -100,7 +101,48 @@ class AdminController extends Controller
         );
     }
 
+    public function get_admins(Request $request){
+        return User::where('userType','!=','User')->get();
+    }
+
+    public function addAdmin(Request $request){
+        $this->validate($request, [
+            'fullName' => 'required',
+            'email' => 'bail| required | email | unique:users',
+            'password' => 'bail | required | min:6',
+            'userType' => 'required'
+        ]);
+
+        $password = bcrypt($request->password);
 
 
+        return User::create([
+                'fullName' => $request->fullName,
+                'email' => $request->email,
+                'password' => $password,
+                'userType' => $request->userType
+            ]
+        );
+    }
+    public function editAdmin(Request $request){
+        $this->validate($request, [
+            'fullName' => 'required',
+            'email' => "bail | required | email | unique:users,email,{$request->id}",
+            'password' => 'min:6',
+            'userType' => 'required'
+        ]);
+
+        $data = [
+            'fullName' => $request->fullName,
+            'email' => $request->email,
+            'userType' => $request->userType
+        ];
+        if($request->password) {
+            $password = bcrypt($request->password);
+            $data['password'] = $password;
+        }
+
+        return User::where('id' ,$request->id)->update($data);
+    }
 }
 
