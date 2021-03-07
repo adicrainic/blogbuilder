@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div>
+
+        <div v-if="$store.state.user">
             <!--========== ADMIN SIDE MENU one ========-->
             <div class="_1side_menu" >
                 <div class="_1side_menu_logo">
@@ -24,6 +25,8 @@
                             <li><router-link to="adminusers"><Icon type="ios-speedometer" /> Admin users</router-link></li>
                             <li><router-link to="role"><Icon type="ios-speedometer" /> Role Management</router-link></li>
                             <li><router-link to="assignRole"><Icon type="ios-speedometer" /> Assign role</router-link></li>
+                            <li><a href="/logout"><Icon type="ios-speedometer" /> Logout</a></li>
+
                         </ul>
                     </div>
                 </div>
@@ -52,7 +55,15 @@
 
 <script>
 export default {
-    name: "mainapp.vue"
+    props: ['user'],
+    data(){
+        return {
+            isLoggedIn:false
+        }
+    },
+    created() {
+        this.$store.commit('updateUser', this.user)
+    }
 }
 </script>
 

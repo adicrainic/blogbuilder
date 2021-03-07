@@ -33,15 +33,13 @@ Route::post('app/create_admin', [AdminController::class, 'addAdmin']);
 Route::post('app/edit_admin', [AdminController::class, 'editAdmin']);
 Route::post('app/delete_admin', [AdminController::class, 'deleteAdmin']);
 
+Route::post('app/admin_login', [AdminController::class, 'adminLogin']);
+
+
+Route::get('/logout', [AdminController::class, 'logout']);
 
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [AdminController::class, 'index']);
+Route::any('{slug}', [AdminController::class, 'index']);
 
-
-//if no match found do this
-Route::any('{slug}',function() {
-    return view('welcome');
-});

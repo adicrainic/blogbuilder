@@ -8,7 +8,8 @@ import hooks from './components/pages/basic/hooks'
 import home from './components/pages/home'
 import tags from './admin/pages/tags'
 import category from './admin/pages/category'
-import adminusers from "./admin/pages/adminusers";
+import adminusers from "./admin/pages/adminusers"
+import login from "./admin/pages/login"
 
 const routes = [
     //admin project routes
@@ -27,6 +28,10 @@ const routes = [
     {
         path: '/adminusers',
         component: adminusers
+    },
+    {
+        path: '/login',
+        component: login
     },
     //test routes
     {

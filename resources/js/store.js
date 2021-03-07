@@ -11,7 +11,8 @@ export default new Vuex.Store({
             data: null,
             deleteIndex: -1,
             isDeleted: false
-        }
+        },
+        user: false
 
     },
     getters: {
@@ -36,6 +37,9 @@ export default new Vuex.Store({
         },
         setDeletingModalObj(state,data) {
             state.deleteModalObj = data;
+        },
+        updateUser(state, data) {
+            state.user = data
         }
     },
     actions: {

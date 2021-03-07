@@ -17,7 +17,11 @@
     </head>
     <body class="">
             <div id="app">
-                <mainapp></mainapp>
+                @if(Auth::check())
+                <mainapp :user="{{Auth::user()}}"></mainapp>
+                @else
+                <mainapp :user="false"></mainapp>
+                @endif
             </div>
     </body>
 
