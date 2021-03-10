@@ -371,8 +371,8 @@ textarea {
 ._1side_menu_logo {
     text-align: center;
     border-bottom: 1px solid #f4f4f5;
-    height: 56px;
-    padding-top: 18px;
+    padding-top: 0px;
+    background-color:#fff;
 }
 ._1side_menu_content {
     /*height: -moz-calc(100% - (20px + 30px));*/
@@ -3137,5 +3137,9 @@ i.cross_icon{
     width: 40px;
 }
 .center_button{
+    margin-top: 10px;
+}
+
+.center_button {
     margin-top: 10px;
 }

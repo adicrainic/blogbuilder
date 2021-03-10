@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
             <div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-                <p class="_title0">admins     <Button @click="addModal=true"><Icon type="md-add" /> Add Admin</Button></p>
+                <p class="_title0">Users     <Button @click="addModal=true"><Icon type="md-add" /> Add User</Button></p>
 
                 <div class="_overflow _table_div">
                     <table class="_table">
@@ -24,7 +24,7 @@
                             <td>{{admin.id}}</td>
                             <td class="_table_name">{{admin.fullName}}</td>
                             <td>{{admin.email}}</td>
-                            <td>{{admin.userType}}</td>
+                            <td>{{admin.role_id}}</td>
 
                             <td>{{admin.created_at}}</td>
                             <td>
@@ -51,14 +51,13 @@
                         <Input v-model="data.password" type="password" placeholder="Password" />
                     </div>
                     <div class="space">
-                        <Select v-model="data.userType" placeholder="Select Admin Type">
-                            <Option value="Admin"></Option>
-                            <Option value="Editor"></Option>
+                        <Select v-model="data.role_id" placeholder="Select Admin Type">
+                            <Option :value="r.id" v-for="(r, i) in roles" :key="i" v-if="roles.length">{{r.name}}</Option>
                         </Select>
                     </div>
                     <div slot="footer">
                         <Button type="default" @click="addModal=false">Close</Button>
-                        <Button type="primary" @click="addAdmin" :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Adding' : 'Add Admin'}}</Button>
+                        <Button type="primary" @click="addAdmin" :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Adding' : 'Add'}}</Button>
                     </div>
                 </Modal>
                 <!-- admin editing modal-->
@@ -78,9 +77,8 @@
                         <Input v-model="editData.password" type="password" placeholder="Password" />
                     </div>
                     <div class="space">
-                        <Select v-model="editData.userType" placeholder="Select Admin Type">
-                            <Option value="Admin"></Option>
-                            <Option value="Editor"></Option>
+                        <Select v-model="editData.role_id" placeholder="Select Admin Type">
+                            <Option :value="r.id" v-for="(r, i) in roles" :key="i" v-if="roles.length"></Option>
                         </Select>
                     </div>
 
@@ -108,7 +106,7 @@ export default {
                 fullName: '',
                 email: '',
                 password: '',
-                userType: 'Admin'
+                role_id: null
             },
             addModal: false,
             editModal: false,
@@ -118,13 +116,14 @@ export default {
                 fullName: '',
                 email: '',
                 password: '',
-                userType: ''
+                role_id: null
             },
             index: -1,
             showDeleteModal: false,
             isDeleting: false,
             deleteItem: {},
-            deletingIndex: -1
+            deletingIndex: -1,
+            roles: []
         }
     },
     methods: {
@@ -135,12 +134,13 @@ export default {
                 return this.errorMessage('Email is required!')
             if(this.data.password.trim() == '')
                 return this.errorMessage('Password is required!')
-            if(this.data.userType.trim() == '')
-                return this.errorMessage('User Type is required!')
+            if(!this.data.role_id)
+                return this.errorMessage('Role is required!')
+
             const res = await this.callApi('post', 'app/create_admin', this.data)
             if (res.status === 201) {
                 this.admins.unshift(res.data);
-                this.successMessage('Admin added successfully !');
+                this.successMessage('User added successfully !');
                 this.addModal = false;
                 this.data.fullName = '';
             } else {
@@ -159,13 +159,13 @@ export default {
                 return this.errorMessage('Full Name is required!')
             if(this.editData.email.trim() == '')
                 return this.errorMessage('Email is required!')
-            if(this.editData.userType.trim() == '')
-                return this.errorMessage('User Type is required!')
+            if(!this.editData.role_id)
+                return this.errorMessage('Role is required!')
 
-            const res = await this.callApi('post', 'app/edit_admin', this.editData)
+            const res6 = await this.callApi('post', 'app/edit_admin', this.editData)
             if (res.status === 200) {
                 this.admins[this.index] = this.data;
-                this.successMessage('Admin edited successfully !');
+                this.successMessage('User edited successfully !');
                 this.editModal = false;
             } else {
                 if(res.status === 422) {
@@ -185,7 +185,7 @@ export default {
                 fullName : admin.fullName,
                 email : admin.email,
                 password : admin.password,
-                userType : admin.userType
+                role_id : admin.role_id
             }
             this.editData = obj;
             this.editModal =true;
@@ -219,9 +219,18 @@ export default {
     },
 
     async created() {
-        const  res =  await this.callApi('get', 'app/get_admins')
+        const [res, resRole] = await Promise.all([
+            await this.callApi('get', 'app/get_admins'),
+            await this.callApi('get', 'app/get_roles')
+        ])
+
         if(res.status === 200) {
             this.admins = res.data;
+        }else{
+            this.errorMessage('An error ocurred !');
+        }
+        if(resRole.status === 200) {
+            this.roles = resRole.data;
         }else{
             this.errorMessage('An error ocurred !');
         }

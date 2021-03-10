@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Role;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class AdminController extends Controller
         }
 
         $user = Auth::user();
-        if($user->userType == 'User') {
+        if($user->role->isAdmin == 0) {
             return redirect('/login');
         }
         if($request->path() == 'login') {
@@ -128,7 +129,7 @@ class AdminController extends Controller
     }
 
     public function get_admins(Request $request){
-        return User::where('userType','!=','User')->get();
+        return User::all();
     }
 
     public function addAdmin(Request $request){
@@ -136,7 +137,7 @@ class AdminController extends Controller
             'fullName' => 'required',
             'email' => 'bail| required | email | unique:users',
             'password' => 'bail | required | min:6',
-            'userType' => 'required'
+            'role_id' => 'required'
         ]);
 
         $password = bcrypt($request->password);
@@ -146,7 +147,7 @@ class AdminController extends Controller
                 'fullName' => $request->fullName,
                 'email' => $request->email,
                 'password' => $password,
-                'userType' => $request->userType
+                'role_id' => $request->role_id
             ]
         );
     }
@@ -155,13 +156,13 @@ class AdminController extends Controller
             'fullName' => 'required',
             'email' => "bail | required | email | unique:users,email,{$request->id}",
             'password' => 'min:6',
-            'userType' => 'required'
+            'role_id' => 'required'
         ]);
 
         $data = [
             'fullName' => $request->fullName,
             'email' => $request->email,
-            'userType' => $request->userType
+            'role_id' => $request->role_id
         ];
         if($request->password) {
             $password = bcrypt($request->password);
@@ -180,7 +181,7 @@ class AdminController extends Controller
 
         if(Auth::attempt ($credentials)) {
             $user = Auth::user();
-            if($user->userType == 'User') {
+            if($user->role->isAdmin == 0) {
                 Auth::logout();
                 return response()->json([
                     'msg' => 'Incorrect login details !'
@@ -196,6 +197,56 @@ class AdminController extends Controller
                 'msg' => 'Incorrect login details !'
             ],401);
         }
+    }
+
+    public function deleteAdmin(Request $request){
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+        return User::where('id' ,$request->id)->delete();
+    }
+
+    public function get_roles(Request $request){
+        return Role::all();
+    }
+
+    public function addRole(Request $request){
+        $this->validate($request, [
+            'name' => 'required'
+        ]);
+
+        return Role::create([
+                'name' => $request->name
+            ]
+        );
+    }
+
+    public function editRole(Request $request){
+        $this->validate($request, [
+            'name' => 'required',
+            'id' => 'required',
+        ]);
+        return Role::where('id' ,$request->id)->update([
+                'name' => $request->name
+            ]
+        );
+    }
+
+    public function deleteRole(Request $request){
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+        return Role::where('id' ,$request->id)->delete();
+    }
+
+    public function assignRole(Request $request){
+        $this->validate($request, [
+            'permission' => 'required',
+        ]);
+        return Role::where('id' ,$request->id)->update([
+                'permission' => $request->permission
+            ]
+        );
     }
 }
 
