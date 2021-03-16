@@ -18,7 +18,7 @@
     <body class="">
             <div id="app">
                 @if(Auth::check())
-                <mainapp :user="{{Auth::user()}}"></mainapp>
+                <mainapp :user="{{Auth::user()}}" :permission="{{Auth::user()->role->permission}}"></mainapp>
                 @else
                 <mainapp :user="false"></mainapp>
                 @endif
@@ -27,4 +27,3 @@
 
 <script src="{{mix('/js/app.js')}}"></script>
 </html>
-{{--https://www.youtube.com/watch?v=NMTEfaPEYB8&list=PLKpfEl4N7tRqIx4VZmuZBnUQ6vG4uDgq7&index=2--}}
