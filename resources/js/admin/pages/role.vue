@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
             <div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-                <p class="_title0">Roles     <Button @click="addModal=true"><Icon type="md-add" /> Add Role</Button></p>
+                <p class="_title0">Roles     <Button @click="addModal=true" v-if="allowWrite"><Icon type="md-add" /> Add Role</Button></p>
 
                 <div class="_overflow _table_div">
                     <table class="_table">
@@ -25,8 +25,8 @@
                             <td>{{role.isAdmin}}</td>
                             <td>{{role.created_at}}</td>
                             <td>
-                                <Button type="info" size="small" @click="showEditModal(role, i)">Edit</Button>
-                                <Button type="error" size="small"  @click="showDeletingModal(role, i)" :loading="isDeleting">Delete</Button>
+                                <Button type="info" size="small" @click="showEditModal(role, i)" v-if="allowUpdate">Edit</Button>
+                                <Button type="error" size="small"  @click="showDeletingModal(role, i)" :loading="isDeleting" v-if="allowDelete">Delete</Button>
                             </td>
                         </tr>
                     </table>

@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
             <div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-                <p class="_title0">Categories     <Button @click="addModal=true"><Icon type="md-add" /> Add Category</Button></p>
+                <p class="_title0">Categories     <Button @click="addModal=true" v-if="allowWrite"><Icon type="md-add" /> Add Category</Button></p>
 
                 <div class="_overflow _table_div">
                     <table class="_table">
@@ -26,8 +26,8 @@
                             </td>
                             <td>{{category.created_at}}</td>
                             <td>
-                                <Button type="info" size="small" @click="showEditModal(category, i)">Edit</Button>
-                                <Button type="error" size="small"  @click="showDeletingModal(category, i)" :loading="isDeleting">Delete</Button>
+                                <Button type="info" size="small" @click="showEditModal(category, i)" v-if="allowUpdate">Edit</Button>
+                                <Button type="error" size="small"  @click="showDeletingModal(category, i)" :loading="isDeleting" v-if="allowDelete">Delete</Button>
                             </td>
                         </tr>
                     </table>

@@ -28,7 +28,7 @@
                             <td><Checkbox v-model="r.delete"></Checkbox></td>
                         </tr>
                         <div class="center_button">
-                            <Button type="primary" :loading="isSending" :disabled="isSending" @click="assignRoles">Assign</Button>
+                            <Button type="primary" :loading="isSending" :disabled="isSending" @click="assignRoles" v-if="allowWrite">Assign</Button>
                         </div>
                     </table>
                 </div>

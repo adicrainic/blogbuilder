@@ -1,3 +1,4 @@
+import { mapGetters } from 'vuex'
 export  default {
     data() {
         return {
@@ -50,8 +51,47 @@ export  default {
                 desc: desc
             });
         },
+        checkUserPermission(key) {
+            if(!this.userPermission) return true
 
 
+            let isPermitted = false
+            for(let d of this.userPermission) {
+                if(this.$route.name === d.name) {
+                    if(d[key])
+                    {
+                        isPermitted = true;
+                        break;
+                    }
+                }
+            }
+
+            return isPermitted
+        }
+    },
+
+    computed: {
+        ...mapGetters(
+            {
+                "userPermission" : "getUserPermission"
+            }
+        ),
+
+
+        allowRead() {
+            return this.checkUserPermission('read');
+        },
+        allowWrite() {
+            return this.checkUserPermission('write');
+
+        },
+        allowUpdate() {
+            return this.checkUserPermission('update');
+
+        },
+        allowDelete(){
+            return this.checkUserPermission('delete');
+        }
 
     }
 }
