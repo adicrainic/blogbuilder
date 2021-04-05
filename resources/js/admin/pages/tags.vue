@@ -201,6 +201,3 @@ export default {
 <style scoped>
 
 </style>
-
-
-<!--https://www.youtube.com/watch?v=KfjEZzisQTo-->

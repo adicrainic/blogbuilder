@@ -12,6 +12,7 @@ import adminusers from "./admin/pages/adminusers"
 import login from "./admin/pages/login"
 import role from "./admin/pages/role"
 import assignRole from "./admin/pages/assignRole"
+import createBlog from "./admin/pages/createBlog"
 
 const routes = [
     //admin project routes
@@ -50,6 +51,12 @@ const routes = [
         path: '/assignRole',
         component: assignRole,
         name:'assignRole'
+    },
+    {
+
+        path: '/createBlog',
+        component: createBlog,
+        name:'createBlog'
     },
 
     //test routes

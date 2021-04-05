@@ -23,12 +23,7 @@
                                 <router-link :to="menuItem.name"><Icon type="ios-home" />
                                     {{ menuItem.resourceName }}</router-link>
                             </li>
-<!--                            <li><router-link to="tags"><Icon type="ios-speedometer" /> Tags</router-link></li>-->
-<!--                            <li><router-link to="category"><Icon type="ios-speedometer" /> Category</router-link></li>-->
-<!--                            <li><router-link to="adminusers"><Icon type="ios-speedometer" /> Admin users</router-link></li>-->
-<!--                            <li><router-link to="role"><Icon type="ios-speedometer" /> Role Management</router-link></li>-->
-<!--                            <li><router-link to="assignRole"><Icon type="ios-speedometer" /> Assign role</router-link></li>-->
-<!--                            <li><a href="/logout"><Icon type="ios-speedometer" /> Logout</a></li>-->
+                          <li><a href="/logout"><Icon type="ios-speedometer" /> Logout</a></li>
 
                         </ul>
                     </div>

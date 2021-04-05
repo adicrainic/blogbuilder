@@ -50,6 +50,7 @@ export default {
                 {resourceName: 'Home', read: false, write: false, update: false , delete: false, name: '/'},
                 {resourceName: 'Tags', read: false, write: false, update: false , delete: false, name: 'tags'},
                 {resourceName: 'Category', read: false, write: false, update: false , delete: false, name: 'category'},
+                {resourceName: 'Create Blogs', read: false, write: false, update: false , delete: false, name: 'createBlog'},
                 {resourceName: 'Adminusers', read: false, write: false, update: false , delete: false, name: 'adminusers'},
                 {resourceName: 'AssignRole', read: false, write: false, update: false , delete: false, name: 'assignRole'},
                 {resourceName: 'Role', read: false, write: false, update: false , delete: false, name: 'role'}
@@ -59,6 +60,7 @@ export default {
                 {resourceName: 'Home', read: false, write: false, update: false , delete: false, name: '/'},
                 {resourceName: 'Tags', read: false, write: false, update: false , delete: false, name: 'tags'},
                 {resourceName: 'Category', read: false, write: false, update: false , delete: false, name: 'category'},
+                {resourceName: 'Create Blogs', read: false, write: false, update: false , delete: false, name: 'createBlog'},
                 {resourceName: 'Adminusers', read: false, write: false, update: false , delete: false, name: 'adminusers'},
                 {resourceName: 'AssignRole', read: false, write: false, update: false , delete: false, name: 'assignRole'},
                 {resourceName: 'Role', read: false, write: false, update: false , delete: false, name: 'role'}
