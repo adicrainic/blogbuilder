@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
 use App\Models\Category;
 use App\Models\Role;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class AdminController extends Controller
 {
@@ -267,6 +270,45 @@ class AdminController extends Controller
                 'permission' => $request->permission
             ]
         );
+    }
+
+    public function uploadEditorImage(Request $request){
+        $this->validate($request, [
+           'image' => 'required|mimes:jpeg,jpg,png'
+        ]);
+
+        $picName = time().'.'.$request->image->extension();
+        $request->image->move(public_path('uploads'),$picName);
+        $fileUrl = env('APP_URL').":".env("APP_PORT")."/uploads/$picName";
+        return response()->json([
+            'success' => 1,
+            'file' => [
+                'url' => $fileUrl,
+
+            ],
+        ]);
+    }
+
+    public function slug(){
+        $title = 'This is the title';
+        return Blog::create([
+           'title' => $title,
+           'post' => 'some post',
+           'post_excerpt' => 'abc',
+           'user_id' => 1,
+           'metaDescription' => 'abc'
+        ]);
+    }
+
+    public function createBlog(Request $request){
+        return Blog::create([
+            'title' => $request->title,
+            'post' => $request->post,
+            'post_excerpt' => $request->post_excerpt,
+            'user_id' => Auth::user()->id,
+            'metaDescription' => $request->metaDescription,
+            'jsonData' => $request->jsonData
+        ]);
     }
 }
 
